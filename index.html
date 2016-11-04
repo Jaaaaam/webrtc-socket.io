@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head>
+  <title>Chat App</title>
+</head>
+<script src="/socket.io/socket.io.js"></script>
+<body ng-controller="MainController as mc">
+  <form ng-submit="mc.login()">
+    <input type="text" name="" ng-model="mc.username">
+    <button>Submit</button>
+  </form>
+  <br><br>
+  <form ng-submit="mc.createOffer()">
+    <input type="text" name="" ng-model="mc.peerID">
+    <button>Connect</button>
+  </form>
+
+  <div class="row">
+    <div class="col-md-6">
+      <video id="localVid" autoplay></video>
+    </div>
+    <div class="col-md-6">
+      <video id="remoteVid" autoplay></video>
+    </div>
+  </div>
+
+</body>
+<script src="/node_modules/angular/angular.min.js"></script>
+<script src="./app.js"></script>
+</html>
