@@ -12,6 +12,21 @@
         var configuration = {'iceServers': [{'url': 'stun:stun.1.google.com.19302'}]};
         var pc = new webkitRTCPeerConnection(configuration);
 
+        pc.onicecandidate = function(event) {
+            console.log('event');
+            console.log(event.candidate);
+            if (event.candidate != null) {
+                socket.emit('sendCandidate', {type: 'candidate', candidate: event.candidate});
+            }
+        };
+
+        pc.onaddstream = function(event) {
+            console.log("got remote stream");
+            console.log(event.stream);
+            var video = document.getElementById('remoteVid');
+            video.src = URL.createObjectURL(event.stream);
+        }
+
         vm.login = login;
         vm.username = '';
         vm.createOffer = createOffer;
@@ -24,21 +39,21 @@
 
         function createOffer() {
             console.log('create offer');
-            console.log(localStream);
-            pc.addStream(localStream);
-            pc.onicecandidate = function(event) {
-                console.log('event');
-                // console.log(event.candidate);
-                if (event.candidate != null) {
-                    socket.emit('sendCandidate', {type: 'candidate', candidate: event.candidate});
-                }
-            };
-            pc.onaddStream = function(event) {
-                console.log("got remote stream");
-                console.log(event.stream);
-                var peervideo = document.getElementById('remoteVid');
-                peervideo.src = URL.createObjectURL(event.stream);
-            }
+            // console.log(localStream);
+            // pc.addStream(localStream);
+            // pc.onicecandidate = function(event) {
+            //     console.log('event');
+            //     // console.log(event.candidate);
+            //     if (event.candidate != null) {
+            //         socket.emit('sendCandidate', {type: 'candidate', candidate: event.candidate});
+            //     }
+            // };
+            // pc.onaddStream = function(event) {
+            //     console.log("got remote stream");
+            //     console.log(event.stream);
+            //     var peervideo = document.getElementById('remoteVid');
+            //     peervideo.src = URL.createObjectURL(event.stream);
+            // }
 
             pc.createOffer().then(function(offer){
                 console.log('creating offer');
@@ -52,20 +67,20 @@
         socket.on('receiveOffer', function(data) {
             console.log('recieved offer');
             console.log(localStream);
-            pc.addStream(localStream);
-            pc.onicecandidate = function(event) {
-                console.log('event');
-                console.log(event.candidate);
-                if (event.candidate != null) {
-                    socket.emit('sendCandidate', {type: 'candidate', candidate: event.candidate});
-                }
-            };
-            pc.onaddStream = function(event) {
-                console.log("got remote stream");
-                console.log(event.stream);
-                var video = document.getElementById('remoteVid');
-                video.src = URL.createObjectURL(event.stream);
-            }
+            // pc.addStream(localStream);
+            // pc.onicecandidate = function(event) {
+            //     console.log('event');
+            //     console.log(event.candidate);
+            //     if (event.candidate != null) {
+            //         socket.emit('sendCandidate', {type: 'candidate', candidate: event.candidate});
+            //     }
+            // };
+            // pc.onaddStream = function(event) {
+            //     console.log("got remote stream");
+            //     console.log(event.stream);
+            //     var video = document.getElementById('remoteVid');
+            //     video.src = URL.createObjectURL(event.stream);
+            // }
 
             pc.setRemoteDescription(new RTCSessionDescription(data.offer), function(){
                 console.log('setRemoteDescription');
@@ -90,7 +105,7 @@
         });
 
         socket.on('userAnswer', function(data){
-            console.log('user answer');
+            console.log('user answer', data);
             // console.log(data);
             pc.setRemoteDescription(new RTCSessionDescription(data.answer), function(){
                 console.log('User answer');
@@ -125,6 +140,7 @@
 
             navigator.getUserMedia({video: true, audio: true}, function(mediaStream){
                 localStream = mediaStream;
+                pc.addStream(localStream);
                 var video = document.getElementById('localVid');
 
                 video.src = window.URL.createObjectURL(localStream);
